@@ -1,0 +1,22 @@
+# OS
+*.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*~
+
+# Temporary files
+*.tmp
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Test artifacts
+test-results/
+.test-logs/
+
+
+
