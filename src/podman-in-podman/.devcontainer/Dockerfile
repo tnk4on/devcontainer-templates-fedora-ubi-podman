@@ -1,11 +1,11 @@
 # Podman-in-Podman for Dev Containers
 # Allows running containers inside a dev container using Podman
 
-# [Choice] Podman version tag: stable (recommended), latest, or any version (e.g., v5.7.1, v5.7, v5, 5.7.1)
-# Note: 'stable' maps to 'latest'. Version tags use 'v' prefix (e.g., v5.7.1, v5.7, v5)
+# [Choice] Podman version tag: latest or any version (e.g., v5.7.1, v5.7, v5, 5.7.1)
+# Version tags use 'v' prefix (e.g., v5.7.1, v5.7, v5)
 # The 'v' prefix is optional in input - if you specify '5.7.1', it will be used as 'v5.7.1'
 # For best results, specify the full tag with 'v' prefix (e.g., 'v5.7.1', 'v5.7', 'v5')
-ARG VARIANT=stable
+ARG VARIANT=latest
 ARG PODMAN_TAG
 ARG INSTALL_BUILDAH="true"
 ARG INSTALL_SKOPEO="true"
@@ -13,7 +13,7 @@ ARG INSTALL_SKOPEO="true"
 # Official Podman images from quay.io
 # Tag format: quay.io/podman/stable:latest or quay.io/podman/stable:v5.7.1, v5.7, v5, etc.
 # PODMAN_TAG is calculated and passed from devcontainer.json:
-# - 'stable' or 'latest' -> 'latest'
+# - 'latest' -> 'latest'
 # - Other versions -> add 'v' prefix if not present (e.g., '5.7.1' -> 'v5.7.1', 'v5.7.1' -> 'v5.7.1')
 # Default to 'latest' if PODMAN_TAG is not provided
 FROM quay.io/podman/stable:${PODMAN_TAG:-latest}

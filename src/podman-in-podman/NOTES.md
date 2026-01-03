@@ -14,20 +14,17 @@ This template enables running containers inside a dev container using Podman. It
 
 | Input | Actual Tag | Description |
 |-------|------------|-------------|
-| `stable` | `latest` | **Stable Podman image** (recommended) |
-| `latest` | `latest` | Latest Podman image |
+| `latest` | `latest` | Latest Podman image (default) |
 | `5.7.1` | `v5.7.1` | Podman 5.7.1 (full version) |
 | `5.7` | `v5.7` | Podman 5.7.x (minor version) |
 | `5` | `v5` | Podman 5.x (major version) |
 | `v5.7.1` | `v5.7.1` | Podman 5.7.1 (with 'v' prefix) |
 
 All variants use the [official Podman image](https://quay.io/repository/podman/stable) from `quay.io/podman/stable` with the specified tag format:
-- `stable` and `latest` map to `quay.io/podman/stable:latest`
+- `latest` maps to `quay.io/podman/stable:latest`
 - Version tags use the `v` prefix format: `quay.io/podman/stable:v5.7.1`, `v5.7`, `v5`, etc.
 - The `v` prefix is optional in input and will be added automatically if missing
 - You can use any available version tag from the repository
-
-The `stable` tag is recommended for production use.
 
 ### How It Works
 

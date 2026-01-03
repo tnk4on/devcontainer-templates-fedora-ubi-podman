@@ -46,8 +46,10 @@ devcontainer-templates-fedora-ubi-podman/
 │       ├── test.sh
 │       └── test-utils-fedora.sh
 ├── scripts/                    # Test scripts
-│   ├── test-all-combinations.sh
-│   └── test-template.sh
+│   ├── test-all-combinations.sh    # Bash script (macOS/Linux)
+│   ├── test-all-combinations.ps1   # PowerShell script (Windows)
+│   ├── test-template.sh            # Bash script (macOS/Linux)
+│   └── test-template.ps1           # PowerShell script (Windows)
 ├── CONTRIBUTING.md
 ├── LICENSE
 └── README.md
@@ -65,7 +67,7 @@ devcontainer-templates-fedora-ubi-podman/
 # Install devcontainer CLI
 npm install -g @devcontainers/cli
 
-# macOS: Ensure Podman machine is running
+# macOS/Windows: Ensure Podman machine is running
 podman machine start
 ```
 
@@ -73,6 +75,16 @@ podman machine start
 
 #### 1. Test Single Template (Recommended)
 
+**macOS/Windows: Ensure Podman machine is running**
+```bash
+# macOS
+podman machine start
+
+# Windows (PowerShell)
+podman machine start
+```
+
+**macOS/Linux:**
 ```bash
 # Test Fedora template (default options)
 ./scripts/test-template.sh fedora
@@ -90,27 +102,46 @@ podman machine start
 ./scripts/test-template.sh podman-in-podman
 
 # Test Podman-in-Podman with specific Podman version
-./scripts/test-template.sh podman-in-podman imageVariant=v5.7.1
+./scripts/test-template.sh podman-in-podman imageVariant=latest
 
 # Test Podman-in-Podman with custom options
-./scripts/test-template.sh podman-in-podman imageVariant=v5.7.1 installBuildah=false installSkopeo=false
+./scripts/test-template.sh podman-in-podman imageVariant=latest installBuildah=false installSkopeo=false
+```
 
-# Test without cache (rebuild from scratch)
-./scripts/test-template.sh fedora --no-cache
-./scripts/test-template.sh podman-in-podman imageVariant=stable --no-cache
+**Windows (PowerShell):**
+```powershell
+# Test Fedora template (default options)
+.\scripts\test-template.ps1 fedora
+
+# Test Fedora template with specific version
+.\scripts\test-template.ps1 fedora imageVariant=42
+
+# Test UBI template
+.\scripts\test-template.ps1 ubi
+
+# Test UBI template with specific version and variant
+.\scripts\test-template.ps1 ubi imageVariant=9 variant=ubi-minimal
+
+# Test Podman-in-Podman template (default options)
+.\scripts\test-template.ps1 podman-in-podman
+
+# Test Podman-in-Podman with specific Podman version
+.\scripts\test-template.ps1 podman-in-podman imageVariant=latest
+
+# Test Podman-in-Podman with custom options
+.\scripts\test-template.ps1 podman-in-podman imageVariant=latest installBuildah=false installSkopeo=false
 ```
 
 **Usage:**
-```bash
-./scripts/test-template.sh <template-name> [option-name=value ...] [--no-cache]
-```
+- **macOS/Linux:** `./scripts/test-template.sh <template-name> [option-name=value ...]`
+- **Windows:** `.\scripts\test-template.ps1 <template-name> [option-name=value ...]`
 
 **Available Options:**
 
 - **Fedora**: `imageVariant` (e.g., `43`, `42`, `41`, `latest`, `rawhide`)
 - **UBI**: `ubiVersion` (e.g., `10`, `9`, `8`), `variant` (e.g., `ubi`, `ubi-minimal`, `ubi-init`)
 - **Podman-in-Podman**: 
-  - `imageVariant` (e.g., `stable`, `latest`, `v5.7.1`, `v5.7`, `v5`, `5.7.1`)
+  - `imageVariant` (e.g., `latest`, `v5.7.1`, `v5.7`, `v5`, `5.7.1`)
   - `installBuildah` (e.g., `true`, `false`)
   - `installSkopeo` (e.g., `true`, `false`)
 
@@ -118,6 +149,7 @@ podman machine start
 
 Test all supported combinations of versions and variants for each template:
 
+**macOS / Linux (Bash):**
 ```bash
 # Test all combinations
 ./scripts/test-all-combinations.sh
@@ -130,10 +162,26 @@ Test all supported combinations of versions and variants for each template:
 ./scripts/test-all-combinations.sh --only-failed
 ```
 
+**Windows (PowerShell):**
+```powershell
+# Test all combinations
+.\scripts\test-all-combinations.ps1
+
+# Test only specific templates
+.\scripts\test-all-combinations.ps1 -SkipUbi -SkipPodman  # Fedora only
+.\scripts\test-all-combinations.ps1 -SkipFedora            # UBI and Podman only
+
+# Retry only failed tests
+.\scripts\test-all-combinations.ps1 -OnlyFailed
+
+# Show help
+.\scripts\test-all-combinations.ps1 -Help
+```
+
 **Tested Combinations:**
 - **Fedora** (5): 43, 42, 41, latest, rawhide
 - **UBI** (9): Versions (10, 9, 8) × Variants (ubi, ubi-minimal, ubi-init)
-- **Podman-in-Podman** (1): stable (stable and latest are effectively the same)
+- **Podman-in-Podman** (1): latest
 
 **Total: 15 combinations**
 
@@ -150,12 +198,36 @@ code ~/my-project
 # Run "Reopen in Container" from command palette
 ```
 
+### Cross-Platform Testing
+
+The test scripts support multiple environments:
+
+| Environment | Script | Container Runtime |
+|-------------|--------|-------------------|
+| macOS + Podman | `test-all-combinations.sh` | Podman Machine (libkrun) |
+| Linux + Podman | `test-all-combinations.sh` | Rootless Podman |
+| Linux + Docker | `test-all-combinations.sh` | Docker Engine |
+| Windows + Podman | `test-all-combinations.ps1` | Podman Machine (WSL2) |
+
+**Requirements by Platform:**
+
+- **macOS**: Podman Desktop with Podman Machine, Node.js, devcontainer CLI
+- **Linux + Podman**: Podman 5.0+, `podman.socket` enabled, Node.js, devcontainer CLI
+- **Linux + Docker**: Docker Engine, Node.js, devcontainer CLI
+- **Windows**: Podman Desktop with Podman Machine, Node.js, devcontainer CLI
+
+**Enable Podman Socket on Linux (required for rootless Podman):**
+```bash
+systemctl --user enable --now podman.socket
+```
+
 ### Test Script Structure
 
 ```
 scripts/
-├── test-template.sh          # Complete test for single template
-└── test-all-combinations.sh  # Test all version/variant combinations
+├── test-template.sh          # Complete test for single template (Bash)
+├── test-all-combinations.sh  # Test all version/variant combinations (Bash)
+└── test-all-combinations.ps1 # Test all version/variant combinations (PowerShell)
 
 test/
 ├── fedora/
